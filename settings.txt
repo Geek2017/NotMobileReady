@@ -1,0 +1,5 @@
+connection_timeout, 30000
+read_timeout, 0
+sleep, 0
+domain, .com, 
+domain, .net
