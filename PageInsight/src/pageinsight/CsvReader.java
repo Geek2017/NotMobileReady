@@ -39,7 +39,7 @@ public class CsvReader implements Runnable {
                         generated_keys = rs.getInt(1);
                     }
 
-                    System.out.println("Uploading... id: "+generated_keys+" host: "+hosts);
+                    System.out.println("Uploading... id: "+generated_keys+" host: "+hosts + "..done");
 
                 }
             } 

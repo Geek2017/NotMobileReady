@@ -15,10 +15,13 @@ public class PageInsight {
    }
    public static void menu()
    {
-      System.out.println("1 Start Engine");
-      System.out.println("2 View Results ");
-      System.out.println("3 Upload Url ");
-      System.out.println("4 Exit Application  ");
+      System.out.println("-------------------------------------------------\n" +
+"-------- Page Insight Engine v.1(beta) ----------						  \n" +
+"-------------------------------------------------");
+      System.out.println("1.) Start Engine");
+      System.out.println("2.) View Results ");
+      System.out.println("3.) Upload Url ");
+      System.out.println("4.) Exit");
       System.out.println();
       System.out.print("Enter choice : ");
       BufferedReader inp = new BufferedReader (new InputStreamReader(System.in));
