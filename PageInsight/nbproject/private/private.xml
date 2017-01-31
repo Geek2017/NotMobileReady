@@ -3,13 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/Results.java</file>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/Actions.java</file>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/PageInsight.java</file>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/Model.java</file>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/ThreaD.java</file>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/CsvReader.java</file>
-            <file>file:/home/jino/Desktop/nb/PageInsight/src/pageinsight/ReadCsv.java</file>
+            <file>file:/home/jino/Desktop/engine/PageInsight/src/pageinsight/Actions.java</file>
+            <file>file:/home/jino/Desktop/engine/PageInsight/src/pageinsight/ThreaD.java</file>
+            <file>file:/home/jino/Desktop/engine/PageInsight/src/pageinsight/UrlLists.java</file>
+            <file>file:/home/jino/Desktop/engine/PageInsight/src/pageinsight/PageInsight.java</file>
         </group>
     </open-files>
 </project-private>

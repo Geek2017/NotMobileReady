@@ -4,6 +4,7 @@ package pageinsight;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class PageInsight {
    
@@ -69,17 +70,25 @@ public class PageInsight {
    }
    public static void runEngine()
    {
-      Actions action = new Actions();
-
-      ThreaD T1 = new ThreaD( "Page insight", action );
-      T1.start();
-      try 
-      {
-         T1.join();
-      }
-      catch( InterruptedException e) 
-      {
-         System.err.println(e.getMessage());
-      }
+       int counter = 0;
+        
+       ArrayList<Integer> myArray = Model.myHosts("SELECT * FROM urllist");
+      
+        for (Integer strDomainId : myArray) 
+        { 
+            counter+=1;
+             
+            try 
+            {
+               ThreaD T1 = new ThreaD( "Page insight bulk running..", strDomainId , Model.Url(strDomainId));
+               T1.start();
+               T1.join();
+            }
+            catch( InterruptedException e) 
+            {
+               e.printStackTrace();
+            }
+             
+        }    
    }
 }

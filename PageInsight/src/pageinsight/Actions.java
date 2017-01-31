@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -26,130 +27,61 @@ class Actions {
    
    public static final String protocol = "http://";
    
-   private String getHeaderContents(String theUrl)
-   {
-       try
-       {
-            URL url_api = new URL("https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url="+protocol+""+theUrl+"&key=AIzaSyCPFRwvYYi5ASk2g9-RMIztcYSUMo2q_Gc&strategy=mobile");
-
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url_api.openConnection();
-            httpURLConnection.setConnectTimeout(Settings.settings("connection_timeout")); 
-            httpURLConnection.setReadTimeout(Settings.settings("read_timeout")); 
-           
-               StringBuilder builder = new StringBuilder();
-                builder.append(httpURLConnection.getResponseCode())
-                .append(" ")
-                .append(httpURLConnection.getResponseMessage())
-                .append("\n");
-
-                Map<String, List<String>> map = httpURLConnection.getHeaderFields();
-
-                for (Map.Entry<String, List<String>> entry : map.entrySet())
-                {
-                    if (entry.getKey() == null) 
-                        continue;
-                    builder.append( entry.getKey())
-                           .append(": ");
-
-                    List<String> headerValues = entry.getValue();
-                    Iterator<String> it = headerValues.iterator();
-
-                    if (it.hasNext()) {
-                                builder.append(it.next());
-
-                                while (it.hasNext()) {
-                                    builder.append(", ")
-                                           .append(it.next());
-                                }
-                    }
-                    builder.append("\n");
-                }
-
-
-                System.out.println(builder);
-       }
-       catch(MalformedURLException ex) 
-       {
-           System.out.println(ex);
-       }
-       catch (IOException ex) 
-        {
-            System.out.println(ex);
-        } 
-       return "";
-               
-   }
-   private String saveContents(String theUrl, int id, int totalhost, int counter )
+ 
+   public void saveContents(String theUrl, int id, int totalhost, int counter )
    {   
-       startTime = System.currentTimeMillis();
-       
+       /*startTime = System.currentTimeMillis();
+       endTime = System.currentTimeMillis() ;
+       System.out.println( "Elapsed Time: "+((endTime - startTime) / 1000) +" sec" );
+       System.out.println("" + counter +" out of : ("+  Results.full_progress() + ")");*/
+                     
        String result = "";
 
        try
        {
-            URL url_api = new URL("https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url="+protocol+""+theUrl+"&key=AIzaSyCPFRwvYYi5ASk2g9-RMIztcYSUMo2q_Gc&strategy=mobile");
+            URL url = new URL("https://www.googleapis.com/pagespeedonline/v2/runPagespeed?url="+protocol+""+theUrl+"&key=AIzaSyCPFRwvYYi5ASk2g9-RMIztcYSUMo2q_Gc&strategy=mobile");
 
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url_api.openConnection();
-            httpURLConnection.setConnectTimeout(Settings.settings("connection_timeout")); 
-            httpURLConnection.setReadTimeout(Settings.settings("read_timeout"));         
-            
-             if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) 
-             {
-                 InputStreamReader inputStreamReader = new InputStreamReader(httpURLConnection.getInputStream());
-                   BufferedReader bufferedReader = new BufferedReader(inputStreamReader, 8192);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(Settings.settings("connection_timeout")); 
+            con.setReadTimeout(Settings.settings("read_timeout"));         
 
-                   String line = null;
+               if (con.getResponseCode() == HttpURLConnection.HTTP_OK) 
+               {
+                    InputStreamReader input = new InputStreamReader(con.getInputStream());
+                    BufferedReader b = new BufferedReader(input);
 
-                   while((line = bufferedReader.readLine()) != null){
+                    String line = null;
+
+                    while((line = b.readLine()) != null){
                        result += line;
-                   }
 
-                  bufferedReader.close();
-                  
-                   System.out.println();
-                   System.out.println("Url : "+Model.Url(id));
-                   System.out.println("Response : "+httpURLConnection.getResponseCode());
-                   endTime = System.currentTimeMillis() ;
-                   System.out.println( "Elapsed Time: "+((endTime - startTime) / 1000) +" sec" );
-                   ParseResult(result,Model.Url( id ),id);
-                   System.out.println("" + counter +" out of : ("+  Results.full_progress() + ")");
-                   System.out.println();
-             }
-             else
-             {
-                   status_code = skip;
-                   String url = Model.Url(id);
-                   String result_id = Model.Url(id);
-                   String string_result_score0 = skip;
-                   String stat = skip;
-                   String string_result_score1 = skip;
-                   
-                   System.out.println();
-                   
-                   System.out.println( "Url : "+ Model.Url( id ) );
-                   System.out.println("Response : "+httpURLConnection.getResponseCode());
-                    endTime = System.currentTimeMillis() ;
-                   System.out.println( "Elapsed Time: "+((endTime - startTime) / 1000) +" sec" );
-                   Model.Save_url(status_code,url,url,result_id,string_result_score0,stat,string_result_score1,id);
-                   System.out.println("" + counter +" out of : ("+   Results.full_progress() + ")");
-                   System.out.println();
-             }
+                      }
+                     ParseResult(result,theUrl,id,con.getResponseCode());        
+               }
+               else
+               {  
+                     ArrayList<UrlSkipped> objLists = new ArrayList<>();
+                     objLists.add( new UrlSkipped(1 , id,  theUrl, con.getResponseCode() )); 
+                     for (UrlSkipped obj : objLists) 
+                     {
+                         System.out.println(obj);
+                     }
+               }   
        }
        catch(MalformedURLException ex) 
        {
-           System.out.println(ex);
+           System.out.println(ex.getMessage());
        }
        catch (IOException ex) 
        {
+          
             System.out.println("Read timed out: "+theUrl+" more than: "+Settings.settings("connection_timeout")+ " milliseconds");
-       } 
-       return "";
-   }
-   private static String ParseResult(String json,String url, int id){
-         
-       status_code = "save";
-       String stat=""; 
+       }
        
+   }
+  
+   private void ParseResult(String json,String url, int id, int respCode){
+
        try
        {
            JSONObject jsonObject = new JSONObject(json);
@@ -165,7 +97,7 @@ class Actions {
            JSONObject JSONObject_sc1 = JSONObject_rg.getJSONObject("USABILITY");
               int result_score1 = JSONObject_sc1.getInt("score");
               String string_result_score1 = Integer.toString(result_score1);
-
+              String stat=""; 
 
               if (result_score1 > 85) 
               {
@@ -178,26 +110,17 @@ class Actions {
             
             try
             {
-               Model.Save_url(status_code,url,url,result_id,string_result_score0,stat,string_result_score1,id);
+                Model.SaveParsed(url,url,result_id,string_result_score0,stat,string_result_score1,id, respCode);
             }
             catch( Exception ex)
             {
-                System.out.println(ex);
+                System.out.println("reason : " + ex.getMessage());
             }
        }
        catch( JSONException ex )
        {
            System.out.println( ex );
        }
-       
-         return "";
+        }
     }
-   public void printHeaders(String url, int id) 
-   {
-       getHeaderContents(url);
-   }
-   public void saveParseData(String url, int id, int totalhost, int counter) 
-   {
-      saveContents(url,id,totalhost,counter);
-   }
-}
+  

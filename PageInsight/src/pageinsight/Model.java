@@ -14,8 +14,8 @@ private static ResultSet rs = null;
 private static final String tblUrlResult = "urlresult";
    
     public static ArrayList<Integer> myHosts(String query)
-    {
-
+    {  
+        ArrayList<String> myDomain = Settings.domains("domain");
         ArrayList<Integer> hosts = new ArrayList<>();
 
          try
@@ -24,9 +24,17 @@ private static final String tblUrlResult = "urlresult";
                 stmt = con.createStatement();
                 rs = stmt.executeQuery(query);
 
-                while(rs.next())  
-                hosts.add(rs.getInt(1));
-                    
+                while(rs.next())  {
+                 for (String thisDomain : myDomain) 
+                 {
+                      boolean startWith = rs.getString(2).contains( thisDomain ) ; 
+                      if (startWith) 
+                      {
+                          hosts.add(rs.getInt(1));   
+                      }
+                 }
+                 
+                }
               }
               catch(SQLException e)
               { 
@@ -72,7 +80,7 @@ private static final String tblUrlResult = "urlresult";
    public static String Url(int id)
    {
        String url = "";
-       
+
         try
           {  
             con = ConnectionManager.getConnection();
@@ -84,50 +92,35 @@ private static final String tblUrlResult = "urlresult";
                 
           }
           catch(SQLException e)
-          { 
-              System.out.println(e);
-          } 
-          finally
-          {
-              try { con.close(); } catch (Exception e) { }
-              try { stmt.close(); } catch (Exception e) { }
-              try { rs.close(); } catch (Exception e) { }
-          }
+              { 
+                 // System.out.println(e);
+              }
+              finally
+              {
+//                    try { con.close(); } catch (Exception e) { }
+//                    try { stmt.close(); } catch (Exception e) { }
+//                    try { rs.close(); } catch (Exception e) { }
+              }
          
         return url;
    }
-   static public String Save_url(String status_code, String url, String site_name, String site_url,String speed_score, String status, String mobile_freindly_score,int urllist_id)
+   public static String SaveParsed(String url, String site_name, String site_url,String speed_score, String status, String mobile_freindly_score,int urllist_id, int responsecode)
    {
        
        String sql = "";
-       int generated_keys = 0;
-       
          try
          {
             con = ConnectionManager.getConnection();
             stmt = con.createStatement();
-            
-            switch(status_code)
-            {
-                case "skip":
-                        sql = "INSERT INTO urlresult(urllist_id,site_name,site_url,speed_score,status,mobile_freindly_score)VALUES ('"+urllist_id+"','"+url+"', '"+site_url+"', '0','skipped','0')";
-                        generated_keys = stmt.executeUpdate(sql,Statement.RETURN_GENERATED_KEYS);
-                    break;
-                    
-                case "save":
-                     sql = "INSERT INTO urlresult(urllist_id,site_name,site_url,speed_score,status,mobile_freindly_score)VALUES ('"+urllist_id+"','"+url+"', '"+site_url+"', '"+speed_score+"','"+status+"','"+mobile_freindly_score+"')";
-                     generated_keys = stmt.executeUpdate(sql,Statement.RETURN_GENERATED_KEYS);
-                    break;
-            }
            
-            rs = stmt.getGeneratedKeys();
-
-            if (rs.next()){
-                generated_keys = rs.getInt(1);
-            }
-                 
-           rs = stmt.executeQuery("SELECT * FROM "+ tblUrlResult +" WHERE id="+generated_keys );
+            sql = "INSERT INTO urlresult(urllist_id,site_name,site_url,speed_score,status,mobile_freindly_score)VALUES ('"+urllist_id+"','"+url+"', '"+site_url+"', '"+speed_score+"','"+status+"','"+mobile_freindly_score+"')";
+            stmt.executeUpdate(sql);
+                  
+           
+            rs = stmt.executeQuery("SELECT * FROM "+ tblUrlResult +" WHERE urllist_id="+urllist_id );
             while(rs.next()){  
+                System.out.println("Url : " + url +" ");
+                System.out.println("Response : "+ responsecode);
                 System.out.println("Result : Speed score(" + rs.getString(5)+") ");
                 System.out.println("Mobile freindliness Grade: ("+rs.getString(7)+")");
                 System.out.println("Status: (" + rs.getString(6)+") ");
@@ -136,13 +129,39 @@ private static final String tblUrlResult = "urlresult";
          }
          catch(SQLException ex)
          {
-             System.out.println(ex);
+            //System.out.println(ex);
          }
          finally
          {
-             try { con.close(); } catch (Exception e) { }
-             try { stmt.close(); } catch (Exception e) { }
-             try { rs.close(); } catch (Exception e) { }
+//             try { con.close(); } catch (Exception e) { }
+//             try { stmt.close(); } catch (Exception e) { }
+//             try { rs.close(); } catch (Exception e) { }
+         }
+         
+         return "";
+   }
+   public static String SaveSkip(String url, int urllist_id)
+   {
+       
+       String sql = "";
+       
+         try
+         {
+            con = ConnectionManager.getConnection();
+            stmt = con.createStatement();
+          
+            sql = "INSERT INTO urlresult(urllist_id,site_name,site_url,speed_score,status,mobile_freindly_score)VALUES ('"+urllist_id+"','"+url+"', '"+url+"', 'skipped','skipped','skipped')";
+            stmt.executeUpdate(sql);
+         }
+         catch(SQLException ex)
+         {
+            //System.out.println(ex);
+         }
+         finally
+         {
+//             try { con.close(); } catch (Exception e) { }
+//             try { stmt.close(); } catch (Exception e) { }
+//             try { rs.close(); } catch (Exception e) { }
          }
          
          return "";

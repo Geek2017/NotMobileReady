@@ -1,70 +1,31 @@
 package pageinsight;
-import java.util.ArrayList;
 
 class ThreaD extends Thread {
     
    private Thread t;
    private final String threadName;
-   private final String query = "select * from urllist";
-   Actions actions;
+   private final String query = "SELECT * FROM urllist";
+   private int ids = 0;
+   private String names = "";
    
-   ThreaD( String name,  Actions action) {
+   ThreaD( String name,  int id, String names) {
       threadName = name;
-      actions = action;
+      this.ids = id;
+      this.names = names;
    }
-   
    @Override
    public void run()
-   {   
-       response();
-   }
-   public void response()
-   {
-       synchronized(actions) 
-        {
-            ArrayList<Integer> myArray = Model.myHosts(query);
-            
-            int counter = 0;
-            int  TotalHost = 0; //counts();
-             
-            for (Integer strDomainId : myArray) 
-            {
-                 ArrayList<String> myDomain = Settings.domains("domain");
-                 
-                 for (String thisDomain : myDomain) 
-                 {
-                        boolean startWith = Model.Url(strDomainId).contains( thisDomain  ) ;
-                        
-                        if (startWith) 
-                        {
-                            counter+=1;
-                            
-                            if( Model.check_parsed( Model.Url(strDomainId) ) == false) {   
-                                 TotalHost += (startWith ? 1 : 0);
-                                try 
-                                {
-                                   //actions.printHeaders( Model.Url(strDomainId) , strDomainId );
-                                   System.out.println("Querying.." + Model.Url(strDomainId));
-                                   t.sleep(Settings.settings("sleep"));
-                                   actions.saveParseData( Model.Url(strDomainId) , strDomainId, TotalHost, counter );
-                                } 
-                                catch (InterruptedException ex) 
-                                {
-                                   System.out.println(ex.getMessage());
-                                }
-                                
-                            }
-                        }
-                 }
-              }
-        }
-      System.out.println( threadName + " exiting.");
+   {  
+       // System.out.println("Querying.." + names );
+        Actions actions = new Actions();
+        synchronized(actions) {
+              actions.saveContents( names , ids, 1,1);
+        }  
+      //System.out.println( threadName + " exiting.");
    }
    @Override
-   public void start () {
-       
-      System.out.println("Starting " +  threadName );
-      
+   public void start () {     
+      //System.out.println("Starting " +  threadName );
       if (t == null) 
       {
          t = new Thread (this, threadName);
